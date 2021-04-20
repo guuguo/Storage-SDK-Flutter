@@ -1,7 +1,7 @@
 part of leancloud_storage;
 
 class _LCRemoveRelationOperation extends _LCOperation {
-  List<LCObject> valueList;
+  late List<LCObject> valueList;
 
   _LCRemoveRelationOperation(dynamic value) {
     valueList = List.from([value]);
@@ -23,9 +23,9 @@ class _LCRemoveRelationOperation extends _LCOperation {
   }
 
   @override
-  _LCOperation mergeWithPrevious(_LCOperation previousOp) {
+  _LCOperation mergeWithPrevious(_LCOperation? previousOp) {
     if (previousOp is _LCSetOperation || previousOp is _LCDeleteOperation) {
-      return previousOp;
+      return previousOp!;
     }
     if (previousOp is _LCRemoveRelationOperation) {
       valueList.addAll(previousOp.valueList);
@@ -35,7 +35,7 @@ class _LCRemoveRelationOperation extends _LCOperation {
   }
 
   @override
-  List getNewObjectList() {
+  List? getNewObjectList() {
     return null;
   }
 }

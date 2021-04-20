@@ -1,8 +1,8 @@
 part of leancloud_storage;
 
 class _LCRelatedCondition extends _LCQueryCondition {
-  LCObject parent;
-  String key;
+  LCObject? parent;
+  String? key;
 
   _LCRelatedCondition(this.parent, this.key);
 
@@ -17,7 +17,7 @@ class _LCRelatedCondition extends _LCQueryCondition {
   @override
   Map<String, dynamic> encode() {
     return {
-      '\$relatedTo': {"object": _LCEncoder.encodeLCObject(parent), 'key': key}
+      '\$relatedTo': {"object": _LCEncoder.encodeLCObject(parent!), 'key': key}
     };
   }
 }

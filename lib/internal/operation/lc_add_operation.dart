@@ -1,7 +1,7 @@
 part of leancloud_storage;
 
 class _LCAddOperation extends _LCOperation {
-  List valueList;
+  List? valueList;
 
   _LCAddOperation(Iterable values) {
     valueList = List.from(values);
@@ -10,29 +10,29 @@ class _LCAddOperation extends _LCOperation {
   @override
   apply(oldValue, String key) {
     List result = oldValue != null ? List.from(oldValue) : [];
-    result.addAll(valueList);
+    result.addAll(valueList!);
     return result;
   }
 
   @override
   encode() {
-    return {'__op': 'Add', 'objects': _LCEncoder.encodeList(valueList)};
+    return {'__op': 'Add', 'objects': _LCEncoder.encodeList(valueList!)};
   }
 
   @override
-  _LCOperation mergeWithPrevious(_LCOperation previousOp) {
+  _LCOperation mergeWithPrevious(_LCOperation? previousOp) {
     if (previousOp is _LCSetOperation || previousOp is _LCDeleteOperation) {
-      return previousOp;
+      return previousOp!;
     }
     if (previousOp is _LCAddOperation) {
-      List list = List.from(previousOp.valueList);
-      list.addAll(valueList);
+      List list = List.from(previousOp.valueList!);
+      list.addAll(valueList!);
       valueList = list;
       return this;
     }
     if (previousOp is _LCAddUniqueOperation) {
       List list = previousOp.values.toList();
-      list.addAll(valueList);
+      list.addAll(valueList!);
       valueList = list;
       return this;
     }
@@ -40,7 +40,7 @@ class _LCAddOperation extends _LCOperation {
   }
 
   @override
-  List getNewObjectList() {
+  List? getNewObjectList() {
     return valueList;
   }
 }

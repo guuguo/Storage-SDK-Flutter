@@ -2,7 +2,7 @@ part of leancloud_storage;
 
 /// LeanCloud batch saving utilities.
 class _LCBatch {
-  HashSet<LCObject> objects;
+  late HashSet<LCObject> objects;
 
   _LCBatch(Iterable<LCObject> objs) {
     objects = new HashSet<LCObject>();
@@ -13,24 +13,24 @@ class _LCBatch {
     }
   }
 
-  static bool hasCircleReference(Object object, HashSet<LCObject> parents) {
+  static bool hasCircleReference(Object? object, HashSet<LCObject> parents) {
     if (parents.contains(object)) {
       return true;
     }
-    Iterable deps;
+    Iterable? deps;
     if (object is List) {
       deps = object;
     } else if (object is Map) {
       deps = object.values;
     } else if (object is LCObject) {
-      deps = object._estimatedData.values;
+      deps = object._estimatedData!.values;
     }
     HashSet<LCObject> depParents = HashSet<LCObject>.from(parents);
     if (object is LCObject) {
       depParents.add(object);
     }
     if (deps != null) {
-      for (Object dep in deps) {
+      for (Object? dep in deps) {
         HashSet<LCObject> ps = HashSet<LCObject>.from(depParents);
         if (hasCircleReference(dep, ps)) {
           return true;
@@ -46,23 +46,23 @@ class _LCBatch {
     if (containSelf) {
       batches.addLast(new _LCBatch(objects));
     }
-    HashSet<Object> deps = new HashSet<Object>();
+    HashSet<Object?> deps = new HashSet<Object?>();
     objects.forEach((item) {
-      Iterable it = item._operationMap.values.map((op) {
+      Iterable it = item._operationMap!.values.map((op) {
         return op.getNewObjectList();
       });
       deps.addAll(it);
     });
     do {
-      HashSet<Object> childSet = new HashSet<Object>();
+      HashSet<Object?> childSet = new HashSet<Object?>();
       deps.forEach((dep) {
-        Iterable children;
+        Iterable? children;
         if (dep is List) {
           children = dep;
         } else if (dep is Map) {
           children = dep.values;
         } else if (dep is LCObject && dep.objectId == null) {
-          children = dep._operationMap.values.map((op) {
+          children = dep._operationMap!.values.map((op) {
             return op.getNewObjectList();
           });
         }

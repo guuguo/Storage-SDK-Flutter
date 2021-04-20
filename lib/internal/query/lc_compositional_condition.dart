@@ -6,14 +6,14 @@ class _LCCompositionalCondition extends _LCQueryCondition {
 
   String composition;
 
-  List<_LCQueryCondition> conditionList;
+  List<_LCQueryCondition>? conditionList;
 
-  List<String> orderByList;
-  Set<String> includes;
-  Set<String> selectedKeys;
-  bool includeACL;
-  int skip;
-  int limit;
+  List<String>? orderByList;
+  Set<String>? includes;
+  Set<String>? selectedKeys;
+  bool? includeACL;
+  int? skip;
+  int? limit;
 
   _LCCompositionalCondition({this.composition = And}) {
     conditionList = <_LCQueryCondition>[];
@@ -83,7 +83,7 @@ class _LCCompositionalCondition extends _LCQueryCondition {
     addOperation(key, '\$within', value);
   }
 
-  void whereRelatedTo(LCObject parent, String key) {
+  void whereRelatedTo(LCObject? parent, String? key) {
     add(new _LCRelatedCondition(parent, key));
   }
 
@@ -99,7 +99,7 @@ class _LCCompositionalCondition extends _LCQueryCondition {
     addOperation(key, '\$regex', '.*$subString.*');
   }
 
-  void whereMatches(String key, String regex, String modifiers) {
+  void whereMatches(String key, String regex, String? modifiers) {
     Map<String, dynamic> value = {'\$regex': regex};
     if (modifiers != null) {
       value['\$options'] = modifiers;
@@ -126,7 +126,7 @@ class _LCCompositionalCondition extends _LCQueryCondition {
   /// Ordering
   void orderByAscending(String key) {
     orderByList = <String>[];
-    orderByList.add(key);
+    orderByList!.add(key);
   }
 
   void orderByDecending(String key) {
@@ -137,7 +137,7 @@ class _LCCompositionalCondition extends _LCQueryCondition {
     if (orderByList == null) {
       orderByList = <String>[];
     }
-    orderByList.add(key);
+    orderByList!.add(key);
   }
 
   void addDescendingOrder(String key) {
@@ -148,14 +148,14 @@ class _LCCompositionalCondition extends _LCQueryCondition {
     if (includes == null) {
       includes = new Set<String>();
     }
-    includes.add(key);
+    includes!.add(key);
   }
 
   void select(String key) {
     if (selectedKeys == null) {
       selectedKeys = new Set<String>();
     }
-    selectedKeys.add(key);
+    selectedKeys!.add(key);
   }
 
   void addOperation(String key, String op, dynamic value) {
@@ -163,12 +163,12 @@ class _LCCompositionalCondition extends _LCQueryCondition {
     add(cond);
   }
 
-  void add(_LCQueryCondition cond) {
+  void add(_LCQueryCondition? cond) {
     if (cond == null) {
       return;
     }
-    conditionList.removeWhere((item) => item.equals(cond));
-    conditionList.add(cond);
+    conditionList!.removeWhere((item) => item.equals(cond));
+    conditionList!.add(cond);
   }
 
   @override
@@ -177,38 +177,38 @@ class _LCCompositionalCondition extends _LCQueryCondition {
   }
 
   @override
-  Map<String, dynamic> encode() {
-    if (conditionList == null || conditionList.length == 0) {
+  Map<String, dynamic>? encode() {
+    if (conditionList == null || conditionList!.length == 0) {
       return null;
     }
-    if (conditionList.length == 1) {
-      return conditionList[0].encode();
+    if (conditionList!.length == 1) {
+      return conditionList![0].encode();
     }
-    return {composition: _LCEncoder.encodeList(conditionList)};
+    return {composition: _LCEncoder.encodeList(conditionList!)};
   }
 
   Map<String, dynamic> _buildParams() {
     Map<String, dynamic> result = {'skip': skip, 'limit': limit};
-    if (conditionList != null && conditionList.length > 0) {
+    if (conditionList != null && conditionList!.length > 0) {
       result['where'] = jsonEncode(encode());
     }
-    if (orderByList != null && orderByList.length > 0) {
-      result['order'] = orderByList.join(',');
+    if (orderByList != null && orderByList!.length > 0) {
+      result['order'] = orderByList!.join(',');
     }
-    if (includes != null && includes.length > 0) {
-      result['include'] = includes.join(',');
+    if (includes != null && includes!.length > 0) {
+      result['include'] = includes!.join(',');
     }
-    if (selectedKeys != null && selectedKeys.length > 0) {
-      result['keys'] = selectedKeys.join(',');
+    if (selectedKeys != null && selectedKeys!.length > 0) {
+      result['keys'] = selectedKeys!.join(',');
     }
-    if (includeACL) {
+    if (includeACL!) {
       result['returnACL'] = includeACL;
     }
     return result;
   }
 
-  String _buildWhere() {
-    if (conditionList != null && conditionList.length > 0) {
+  String? _buildWhere() {
+    if (conditionList != null && conditionList!.length > 0) {
       return jsonEncode(encode());
     }
     return null;

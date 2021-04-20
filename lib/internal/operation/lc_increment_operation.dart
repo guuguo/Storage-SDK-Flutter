@@ -19,9 +19,9 @@ class _LCIncrementOperation extends _LCOperation {
   }
 
   @override
-  _LCOperation mergeWithPrevious(_LCOperation previousOp) {
+  _LCOperation mergeWithPrevious(_LCOperation? previousOp) {
     if (previousOp is _LCSetOperation || previousOp is _LCDeleteOperation) {
-      return previousOp;
+      return previousOp!;
     }
     if (previousOp is _LCIncrementOperation) {
       value += previousOp.value;
@@ -31,7 +31,7 @@ class _LCIncrementOperation extends _LCOperation {
   }
 
   @override
-  List getNewObjectList() {
+  List? getNewObjectList() {
     return null;
   }
 }

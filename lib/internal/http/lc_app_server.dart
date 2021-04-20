@@ -7,18 +7,18 @@ class _LCAppServer {
 
   String engineServer;
 
-  DateTime expiredAt;
+  late DateTime expiredAt;
 
   bool get isExpired => _ttl != -1 && expiredAt.compareTo(DateTime.now()) < 0;
 
-  int _ttl;
+  int? _ttl;
 
   _LCAppServer.fromJson(Map<String, dynamic> json)
       : apiServer = _getSchemeUrl(json['api_server']),
         pushServer = _getSchemeUrl(json['push_server']),
         engineServer = _getSchemeUrl(json['engine_server']) {
     _ttl = json['ttl'];
-    Duration validDuration = new Duration(seconds: _ttl);
+    Duration validDuration = new Duration(seconds: _ttl!);
     DateTime fetchedAt = DateTime.now();
     expiredAt = fetchedAt.add(validDuration);
   }

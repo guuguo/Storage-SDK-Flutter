@@ -3,7 +3,7 @@ part of leancloud_storage;
 /// [LCObject] Operation
 abstract class _LCOperation {
   // 与前一个操作做合并
-  _LCOperation mergeWithPrevious(_LCOperation previousOp);
+  _LCOperation mergeWithPrevious(_LCOperation? previousOp);
 
   dynamic encode();
 
@@ -11,5 +11,5 @@ abstract class _LCOperation {
   dynamic apply(dynamic oldValue, String key);
 
   // 得到增加的对象
-  List getNewObjectList();
+  List? getNewObjectList();
 }

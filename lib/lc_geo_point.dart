@@ -2,9 +2,9 @@ part of leancloud_storage;
 
 /// LeanCloud GeoPoint
 class LCGeoPoint {
-  double latitude;
+  double? latitude;
 
-  double longitude;
+  double? longitude;
 
   LCGeoPoint(this.latitude, this.longitude);
 
@@ -29,10 +29,10 @@ class LCGeoPoint {
       throw new ArgumentError.notNull('point');
     }
     double d2r = pi / 180.0;
-    double lat1rad = latitude * d2r;
-    double long1rad = longitude * d2r;
-    double lat2rad = point.latitude * d2r;
-    double long2rad = point.longitude * d2r;
+    double lat1rad = latitude! * d2r;
+    double long1rad = longitude! * d2r;
+    double lat2rad = point.latitude! * d2r;
+    double long2rad = point.longitude! * d2r;
     double deltaLat = lat1rad - lat2rad;
     double deltaLong = long1rad - long2rad;
     double sinDeltaLatDiv2 = sin(deltaLat / 2);

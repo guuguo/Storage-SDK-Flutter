@@ -2,9 +2,9 @@ part of leancloud_storage;
 
 /// Thrown when LeanCloud API returns an error.
 class LCException implements Exception {
-  int code;
+  int? code;
 
-  String message;
+  String? message;
 
   LCException(this.code, this.message);
 }

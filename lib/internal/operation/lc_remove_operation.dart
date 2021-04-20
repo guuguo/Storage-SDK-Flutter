@@ -1,7 +1,7 @@
 part of leancloud_storage;
 
 class _LCRemoveOperation extends _LCOperation {
-  List valueList;
+  late List valueList;
 
   _LCRemoveOperation(Iterable values) {
     valueList = List.from(values);
@@ -22,9 +22,9 @@ class _LCRemoveOperation extends _LCOperation {
   }
 
   @override
-  _LCOperation mergeWithPrevious(_LCOperation previousOp) {
+  _LCOperation mergeWithPrevious(_LCOperation? previousOp) {
     if (previousOp is _LCSetOperation || previousOp is _LCDeleteOperation) {
-      return previousOp;
+      return previousOp!;
     }
     if (previousOp is _LCRemoveOperation) {
       List list = List.from(previousOp.valueList);
@@ -36,7 +36,7 @@ class _LCRemoveOperation extends _LCOperation {
   }
 
   @override
-  List getNewObjectList() {
+  List? getNewObjectList() {
     return null;
   }
 }

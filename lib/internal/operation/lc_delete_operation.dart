@@ -3,7 +3,7 @@ part of leancloud_storage;
 /// Deletion
 class _LCDeleteOperation extends _LCOperation {
   @override
-  _LCOperation mergeWithPrevious(_LCOperation previousOp) {
+  _LCOperation mergeWithPrevious(_LCOperation? previousOp) {
     return this;
   }
 
@@ -18,7 +18,7 @@ class _LCDeleteOperation extends _LCOperation {
   }
 
   @override
-  List getNewObjectList() {
+  List? getNewObjectList() {
     return null;
   }
 }

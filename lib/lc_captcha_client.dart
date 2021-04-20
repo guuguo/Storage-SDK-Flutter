@@ -2,8 +2,8 @@ part of leancloud_storage;
 
 /// An image CAPTCHA to prevent SMS abuse.
 class LCCaptcha {
-  String url;
-  String token;
+  String? url;
+  String? token;
 
   LCCaptcha(this.url, this.token);
 }
@@ -17,7 +17,7 @@ class LCCaptchaClient {
       {int width = 85, int height = 39}) async {
     String path = 'requestCaptcha';
     Map<String, dynamic> params = {'width': width, 'height': height};
-    Map response = await LeanCloud._httpClient.get(path, queryParams: params);
+    Map response = await (LeanCloud._httpClient.get(path, queryParams: params) as FutureOr<Map<dynamic, dynamic>>);
     return new LCCaptcha(response['captcha_url'], response['captcha_token']);
   }
 

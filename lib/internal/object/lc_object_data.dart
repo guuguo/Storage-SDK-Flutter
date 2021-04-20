@@ -2,15 +2,15 @@ part of leancloud_storage;
 
 /// LeanCloud object data.
 class _LCObjectData {
-  String className;
+  String? className;
 
-  String objectId;
+  String? objectId;
 
-  DateTime createdAt;
+  DateTime? createdAt;
 
-  DateTime updatedAt;
+  DateTime? updatedAt;
 
-  Map<String, dynamic> customPropertyMap;
+  Map<String, dynamic>? customPropertyMap;
 
   _LCObjectData() {
     customPropertyMap = new Map<String, dynamic>();
@@ -29,17 +29,17 @@ class _LCObjectData {
         result.updatedAt = DateTime.parse(value).toLocal();
       } else {
         if (key == 'ACL' && value is Map) {
-          result.customPropertyMap[key] = _LCDecoder.decodeACL(value);
+          result.customPropertyMap![key] = _LCDecoder.decodeACL(value);
         } else {
           // 自定义属性
-          result.customPropertyMap[key] = _LCDecoder.decode(value);
+          result.customPropertyMap![key] = _LCDecoder.decode(value);
         }
       }
     });
     return result;
   }
 
-  static Map<String, dynamic> encode(_LCObjectData objectData) {
+  static Map<String, dynamic>? encode(_LCObjectData? objectData) {
     if (objectData == null) {
       return null;
     }
@@ -54,7 +54,7 @@ class _LCObjectData {
       data['updatedAt'] = objectData.updatedAt.toString();
     }
     if (objectData.customPropertyMap != null) {
-      objectData.customPropertyMap.forEach((k, v) {
+      objectData.customPropertyMap!.forEach((k, v) {
         data[k] = _LCEncoder.encode(v);
       });
     }

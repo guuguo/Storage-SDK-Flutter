@@ -43,16 +43,16 @@ class _LCDecoder {
   }
 
   static LCObject decodeNestedObject(dynamic data) {
-    String className = data['className'];
-    LCObject object = LCObject._createByName(className);
+    String? className = data['className'];
+    LCObject object = LCObject._createByName(className)!;
     _LCObjectData objectData = _LCObjectData.decode(data);
     object._merge(objectData);
     return object;
   }
 
   static LCGeoPoint decodePoint(dynamic data) {
-    double latitude = data['latitude'];
-    double longitude = data['longitude'];
+    double? latitude = data['latitude'];
+    double? longitude = data['longitude'];
     return new LCGeoPoint(latitude, longitude);
   }
 

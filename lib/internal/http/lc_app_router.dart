@@ -3,7 +3,7 @@ part of leancloud_storage;
 class _LCAppRouter {
   String appId;
 
-  String server;
+  String? server;
 
   _LCAppRouter(this.appId, this.server) {
     if (!_isInternalApp(appId) && isNullOrEmpty(server)) {
@@ -11,9 +11,9 @@ class _LCAppRouter {
     }
   }
 
-  _LCAppServer _appServer;
+  _LCAppServer? _appServer;
 
-  Future<String> getApiServer() async {
+  Future<String?> getApiServer() async {
     // 优先返回用户自定义域名
     if (!isNullOrEmpty(server)) {
       return server;
@@ -25,11 +25,11 @@ class _LCAppRouter {
       throw ('Please init with your server url.');
     }
     // 向 App Router 请求地址
-    if (_appServer == null || _appServer.isExpired) {
+    if (_appServer == null || _appServer!.isExpired) {
       // 如果没有拉取或已经过期，则重新拉取并缓存
       _appServer = await _fetch();
     }
-    return _appServer.apiServer;
+    return _appServer!.apiServer;
   }
 
   Future<_LCAppServer> _fetch() async {
@@ -42,7 +42,7 @@ class _LCAppRouter {
       Map<String, dynamic> queryParams = {'appId': appId};
       Response response = await dio.get(path, queryParameters: queryParams);
       Map data = response.data;
-      return _LCAppServer.fromJson(data);
+      return _LCAppServer.fromJson(data as Map<String, dynamic>);
     } on DioError {
       return _LCAppServer._getInternalFallbackServer(appId);
     }

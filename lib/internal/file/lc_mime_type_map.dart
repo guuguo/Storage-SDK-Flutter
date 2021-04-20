@@ -1,7 +1,7 @@
 part of leancloud_storage;
 
 class _LCMimeTypeMap {
-  static String getMimeType(String fileName) {
+  static String? getMimeType(String fileName) {
     try {
       String ext = path.extension(fileName).substring(1);
       if (MimeTypesMap.containsKey(ext)) {

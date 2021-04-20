@@ -6,46 +6,46 @@ part of leancloud_storage;
 /// or Document (in some NoSQL databases).
 class LCObject {
   /// The last known data for this object from cloud.
-  _LCObjectData _data;
+  _LCObjectData? _data;
 
   /// The best estimate of this's current data.
-  Map<String, dynamic> _estimatedData;
+  Map<String, dynamic>? _estimatedData;
 
   /// List of sets of changes to the data.
-  Map<String, _LCOperation> _operationMap;
+  Map<String, _LCOperation>? _operationMap;
 
   /// The class name of the object.
   ///
   /// Class is also called Table (in traditional relational databases)
   /// or Collection (in some NoSQL databases).
-  String get className => _data.className;
+  String? get className => _data!.className;
 
   /// Gets the object's objectId.
-  String get objectId => _data.objectId;
+  String? get objectId => _data!.objectId;
 
   /// Gets the object's createdAt attribute.
-  DateTime get createdAt => _data.createdAt;
+  DateTime? get createdAt => _data!.createdAt;
 
   /// Gets the object's updatedAt attribute.
-  DateTime get updatedAt => _data.updatedAt ?? _data.createdAt;
+  DateTime? get updatedAt => _data!.updatedAt ?? _data!.createdAt;
 
   /// Gets the ACL for this object.
-  LCACL get acl => this['ACL'];
+  LCACL? get acl => this['ACL'];
 
   /// Sets the ACL to be used for this object.
-  set acl(LCACL value) => this['ACL'] = value;
+  set acl(LCACL? value) => this['ACL'] = value;
 
   /// If this object has been modified since its last save/refresh.
-  bool _isDirty;
+  late bool _isDirty;
 
   /// Creates a new object in [className].
-  LCObject(String className) {
+  LCObject(String? className) {
     assert(className != null && className.length > 0);
     _data = new _LCObjectData();
     _estimatedData = new Map<String, dynamic>();
     _operationMap = new Map<String, _LCOperation>();
     _isDirty = true;
-    _data.className = className;
+    _data!.className = className;
   }
 
   /// Constructs a object in [className] of [objectId].
@@ -54,14 +54,14 @@ class LCObject {
   static LCObject createWithoutData(String className, String objectId) {
     LCObject object = new LCObject(className);
     assert(objectId != null && objectId.length > 0);
-    object._data.objectId = objectId;
+    object._data!.objectId = objectId;
     object._isDirty = false;
     return object;
   }
 
   /// Gets the value of [key].
   operator [](String key) {
-    dynamic value = _estimatedData[key];
+    dynamic value = _estimatedData![key];
     if (value is LCRelation) {
       // 反序列化后的 Relation 字段并不完善
       value.key = key;
@@ -224,14 +224,14 @@ class LCObject {
   /// then.
   void _rebuildEstimatedData() {
     _estimatedData = new Map<String, dynamic>();
-    _data.customPropertyMap.forEach((String key, dynamic value) {
+    _data!.customPropertyMap!.forEach((String key, dynamic value) {
       // 对容器类型做一个拷贝
       if (value is List) {
-        _estimatedData[key] = List.from(value);
+        _estimatedData![key] = List.from(value);
       } else if (value is Map) {
-        _estimatedData[key] = Map.from(value);
+        _estimatedData![key] = Map.from(value);
       } else {
-        _estimatedData[key] = value;
+        _estimatedData![key] = value;
       }
     });
   }
@@ -239,35 +239,35 @@ class LCObject {
   void _applyOperation(String key, _LCOperation op) {
     // 先累加计算
     if (op is _LCDeleteOperation) {
-      _estimatedData.remove(key);
+      _estimatedData!.remove(key);
     } else {
-      _estimatedData[key] = op.apply(_estimatedData[key], key);
+      _estimatedData![key] = op.apply(_estimatedData![key], key);
     }
     // 再合并为新的操作参数
-    if (_operationMap.containsKey(key)) {
-      _LCOperation previousOp = _operationMap[key];
-      _operationMap[key] = op.mergeWithPrevious(previousOp);
+    if (_operationMap!.containsKey(key)) {
+      _LCOperation? previousOp = _operationMap![key];
+      _operationMap![key] = op.mergeWithPrevious(previousOp);
     } else {
-      _operationMap[key] = op;
+      _operationMap![key] = op;
     }
     _isDirty = true;
   }
 
   void _merge(_LCObjectData data) {
-    _data.className = data.className ?? _data.className;
-    _data.objectId = data.objectId ?? _data.objectId;
-    _data.createdAt = data.createdAt ?? _data.createdAt;
-    _data.updatedAt = data.updatedAt ?? _data.updatedAt;
+    _data!.className = data.className ?? _data!.className;
+    _data!.objectId = data.objectId ?? _data!.objectId;
+    _data!.createdAt = data.createdAt ?? _data!.createdAt;
+    _data!.updatedAt = data.updatedAt ?? _data!.updatedAt;
     // 先将本地的预估数据直接替换
-    _data.customPropertyMap = _estimatedData;
+    _data!.customPropertyMap = _estimatedData;
     // 再将服务端的数据覆盖
-    data.customPropertyMap.forEach((String key, dynamic value) {
-      _data.customPropertyMap[key] = value;
+    data.customPropertyMap!.forEach((String key, dynamic value) {
+      _data!.customPropertyMap![key] = value;
     });
     // 最后重新生成预估数据，用于后续访问和操作
     _rebuildEstimatedData();
     // 清空操作
-    _operationMap.clear();
+    _operationMap!.clear();
     _isDirty = false;
   }
 
@@ -276,7 +276,7 @@ class LCObject {
   /// Can also specifies which [keys] to fetch,
   /// and if this [includes] pointed objects.
   Future<LCObject> fetch(
-      {Iterable<String> keys, Iterable<String> includes}) async {
+      {Iterable<String>? keys, Iterable<String>? includes}) async {
     Map<String, dynamic> queryParams = {};
     if (keys != null) {
       queryParams['keys'] = keys.join(',');
@@ -286,8 +286,8 @@ class LCObject {
     }
     String path = 'classes/$className/$objectId';
     Map response =
-        await LeanCloud._httpClient.get(path, queryParams: queryParams);
-    _LCObjectData objectData = _LCObjectData.decode(response);
+        await (LeanCloud._httpClient.get(path, queryParams: queryParams) as FutureOr<Map<dynamic, dynamic>>);
+    _LCObjectData objectData = _LCObjectData.decode(response as Map<String, dynamic>);
     _merge(objectData);
     return this;
   }
@@ -309,20 +309,20 @@ class LCObject {
     Map<String, dynamic> data = {
       'requests': _LCEncoder.encodeList(requestList)
     };
-    List results = await LeanCloud._httpClient.post('batch', data: data);
+    List results = await (LeanCloud._httpClient.post('batch', data: data) as FutureOr<List<dynamic>>);
     // 反序列化为 Object 数据
-    Map<String, _LCObjectData> map = new Map<String, _LCObjectData>();
+    Map<String?, _LCObjectData> map = new Map<String?, _LCObjectData>();
     results.forEach((item) {
       if (item.containsKey('error')) {
-        int code = item['code'];
-        String message = item['error'];
+        int? code = item['code'];
+        String? message = item['error'];
         throw ('$code : $message');
       }
       Map data = item['success'];
-      map[data['objectId']] = _LCObjectData.decode(data);
+      map[data['objectId']] = _LCObjectData.decode(data as Map<String, dynamic>);
     });
     objectList.forEach((object) {
-      _LCObjectData objectData = map[object.objectId];
+      _LCObjectData objectData = map[object.objectId]!;
       object._merge(objectData);
     });
     return objectList;
@@ -354,7 +354,7 @@ class LCObject {
             ? '/1.1/classes/${item.className}'
             : '/1.1/classes/${item.className}/${item.objectId}';
         String method = item.objectId == null ? 'POST' : 'PUT';
-        Map body = _LCEncoder.encode(item._operationMap);
+        Map? body = _LCEncoder.encode(item._operationMap);
         return {'path': path, 'method': method, 'body': body};
       }).toList();
 
@@ -362,11 +362,11 @@ class LCObject {
       Map<String, dynamic> data = {
         'requests': _LCEncoder.encodeList(requestList)
       };
-      List results = await LeanCloud._httpClient.post('batch', data: data);
+      List results = await (LeanCloud._httpClient.post('batch', data: data) as FutureOr<List<dynamic>>);
       // 反序列化为 Object 数据
       List<_LCObjectData> resultList = results.map((item) {
         if (item.containsKey('error')) {
-          int code = item['code'];
+          int? code = item['code'];
           String message = item['error'].toString();
           throw ('$code : $message');
         }
@@ -385,7 +385,7 @@ class LCObject {
   /// Can also specify whether to [fetchWhenSave],
   /// or only saving the object when it matches the [query].
   Future<LCObject> save(
-      {bool fetchWhenSave = false, LCQuery<LCObject> query}) async {
+      {bool fetchWhenSave = false, LCQuery<LCObject>? query}) async {
     // 检测循环依赖
     if (_LCBatch.hasCircleReference(this, new HashSet<LCObject>())) {
       throw new ArgumentError('Found a circle dependency when save.');
@@ -409,11 +409,11 @@ class LCObject {
       queryParams['where'] = query._buildWhere();
     }
     Map response = objectId == null
-        ? await LeanCloud._httpClient.post(path,
-            data: _LCEncoder.encode(_operationMap), queryParams: queryParams)
-        : await LeanCloud._httpClient.put(path,
-            data: _LCEncoder.encode(_operationMap), queryParams: queryParams);
-    _LCObjectData data = _LCObjectData.decode(response);
+        ? await (LeanCloud._httpClient.post(path,
+            data: _LCEncoder.encode(_operationMap), queryParams: queryParams) as FutureOr<Map<dynamic, dynamic>>)
+        : await (LeanCloud._httpClient.put(path,
+            data: _LCEncoder.encode(_operationMap), queryParams: queryParams) as FutureOr<Map<dynamic, dynamic>>);
+    _LCObjectData data = _LCObjectData.decode(response as Map<String, dynamic>);
     _merge(data);
     return this;
   }
@@ -452,7 +452,7 @@ class LCObject {
   /// The inverse function of [toString].
   static LCObject parseObject(String str) {
     _LCObjectData objectData = _LCObjectData.decode(jsonDecode(str));
-    LCObject object = _createByName(objectData.className);
+    LCObject object = _createByName(objectData.className)!;
     object._merge(objectData);
     return object;
   }
@@ -492,17 +492,17 @@ class LCObject {
     _subclassNameMap[className] = subclassInfo;
   }
 
-  static LCObject _create(Type type, {String className}) {
+  static LCObject? _create(Type type, {String? className}) {
     if (_subclassTypeMap.containsKey(type)) {
-      _LCSubclassInfo subclassInfo = _subclassTypeMap[type];
+      _LCSubclassInfo subclassInfo = _subclassTypeMap[type]!;
       return subclassInfo.constructor();
     }
     return new LCObject(className);
   }
 
-  static LCObject _createByName(String className) {
+  static LCObject? _createByName(String? className) {
     if (_subclassNameMap.containsKey(className)) {
-      _LCSubclassInfo subclassInfo = _subclassNameMap[className];
+      _LCSubclassInfo subclassInfo = _subclassNameMap[className!]!;
       return subclassInfo.constructor();
     }
     return new LCObject(className);

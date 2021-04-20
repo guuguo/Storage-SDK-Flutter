@@ -5,24 +5,24 @@ class LCFile extends LCObject {
   static const String ClassName = '_File';
 
   /// Gets file name.
-  String get name => this['name'];
+  String? get name => this['name'];
 
   /// Sets file name.
-  set name(String value) => this['name'] = value;
+  set name(String? value) => this['name'] = value;
 
-  String get mimeType => this['mime_type'];
+  String? get mimeType => this['mime_type'];
 
-  set mimeType(String value) => this['mime_type'] = value;
+  set mimeType(String? value) => this['mime_type'] = value;
 
-  String get url => this['url'];
+  String? get url => this['url'];
 
-  set url(String value) => this['url'] = value;
+  set url(String? value) => this['url'] = value;
 
-  Map<String, dynamic> get metaData => this['metaData'];
+  Map<String, dynamic>? get metaData => this['metaData'];
 
-  set metaData(Map<String, dynamic> value) => this['metaData'] = value;
+  set metaData(Map<String, dynamic>? value) => this['metaData'] = value;
 
-  Uint8List data;
+  Uint8List? data;
 
   LCFile() : super(ClassName) {
     metaData = new Map<String, dynamic>();
@@ -52,7 +52,7 @@ class LCFile extends LCObject {
   }
 
   void addMetaData(String key, dynamic value) {
-    metaData[key] = value;
+    metaData![key] = value;
   }
 
   /// Saves the file to LeanCloud.
@@ -62,18 +62,18 @@ class LCFile extends LCObject {
   @override
   Future<LCFile> save(
       {bool fetchWhenSave = false,
-      LCQuery<LCObject> query,
-      void Function(int count, int total) onProgress}) async {
+      LCQuery<LCObject>? query,
+      void Function(int count, int total)? onProgress}) async {
     if (url != null) {
       // 外链方式
       await super.save();
     } else {
       // 上传文件
-      Map<String, dynamic> uploadToken = await _getUploadToken();
-      String uploadUrl = uploadToken['upload_url'];
-      String key = uploadToken['key'];
-      String token = uploadToken['token'];
-      String provider = uploadToken['provider'];
+      Map<String, dynamic> uploadToken = await (_getUploadToken() as FutureOr<Map<String, dynamic>>);
+      String? uploadUrl = uploadToken['upload_url'];
+      String? key = uploadToken['key'];
+      String? token = uploadToken['token'];
+      String? provider = uploadToken['provider'];
       try {
         if (provider == 's3') {
           // AWS
@@ -118,7 +118,7 @@ class LCFile extends LCObject {
     return '$url?imageView/$mode/w/$width/h/$height/q/$quality/format/$format';
   }
 
-  Future<Map> _getUploadToken() async {
+  Future<Map?> _getUploadToken() async {
     Map<String, dynamic> data = {
       'name': name,
       'key': _newUUID(),
@@ -126,7 +126,7 @@ class LCFile extends LCObject {
       'mime_type': mimeType,
       'metaData': metaData
     };
-    return await LeanCloud._httpClient.post('fileTokens', data: data);
+    return await (LeanCloud._httpClient.post('fileTokens', data: data) as FutureOr<Map<dynamic, dynamic>?>);
   }
 
   String _newUUID() {

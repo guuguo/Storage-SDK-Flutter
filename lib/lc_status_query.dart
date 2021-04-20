@@ -3,13 +3,13 @@ part of leancloud_storage;
 /// [LCQuery] of [LCStatus] to find someone's statuses.
 class LCStatusQuery extends LCQuery<LCStatus> {
   /// See [LCStatus.inboxType]
-  String inboxType;
+  String? inboxType;
 
   /// Queries [LCStatus] whose messageId is greater than this.
-  int sinceId;
+  int? sinceId;
 
   /// Queries [LCStatus] whose messageId is not greater than this.
-  int maxId;
+  int? maxId;
 
   /// Constructs a [LCQuery] for [LCStatus].
   LCStatusQuery({String inboxType = LCStatus.InboxTypeDefault})
@@ -22,7 +22,7 @@ class LCStatusQuery extends LCQuery<LCStatus> {
   /// See [LCQuery.find].
   Future<List<LCStatus>> find(
       {CachePolicy cachePolicy = CachePolicy.onlyNetwork}) async {
-    LCUser user = await LCUser.getCurrent();
+    LCUser? user = await LCUser.getCurrent();
     if (user == null) {
       throw new ArgumentError.notNull('current user');
     }
@@ -33,19 +33,19 @@ class LCStatusQuery extends LCQuery<LCStatus> {
       'where': _buildWhere(),
       'sinceId': sinceId,
       'maxId': maxId,
-      'limit': condition.limit
+      'limit': condition!.limit
     };
-    Map response = await LeanCloud._httpClient
-        .get('subscribe/statuses', queryParams: params);
+    Map response = await (LeanCloud._httpClient
+        .get('subscribe/statuses', queryParams: params) as FutureOr<Map<dynamic, dynamic>>);
     List results = response['results'];
     List<LCStatus> list = [];
     results.forEach((item) {
       _LCObjectData objectData = _LCObjectData.decode(item);
       LCStatus status = new LCStatus();
       status._merge(objectData);
-      status.messageId = objectData.customPropertyMap[LCStatus.MessageIdKey];
+      status.messageId = objectData.customPropertyMap![LCStatus.MessageIdKey];
       status.data = objectData.customPropertyMap;
-      status.inboxType = objectData.customPropertyMap[LCStatus.InboxTypeKey];
+      status.inboxType = objectData.customPropertyMap![LCStatus.InboxTypeKey];
       list.add(status);
     });
     return list;

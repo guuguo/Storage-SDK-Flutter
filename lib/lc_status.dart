@@ -2,9 +2,9 @@ part of leancloud_storage;
 
 /// [LCStatus] count.
 class LCStatusCount {
-  int total;
+  int? total;
 
-  int unread;
+  int? unread;
 }
 
 /// LeanCloud Status
@@ -24,20 +24,20 @@ class LCStatus extends LCObject {
   static const String MessageIdKey = 'messageId';
 
   /// Id.
-  int messageId;
+  int? messageId;
 
   /// The type of inbox.
   /// 
   /// There are two built-in inbox types:
   /// `timeline` (alias: `default`) and `private`.
   /// You can customize your own inbox types.
-  String inboxType;
+  String? inboxType;
 
   /// A query for targets of status. 
-  LCQuery query;
+  LCQuery? query;
 
   /// Content.
-  Map<String, dynamic> data;
+  Map<String, dynamic>? data;
 
   LCStatus() : super(ClassName) {
     inboxType = InboxTypeDefault;
@@ -49,12 +49,12 @@ class LCStatus extends LCObject {
     if (status == null) {
       throw ArgumentError.notNull('status');
     }
-    LCUser user = await LCUser.getCurrent();
+    LCUser? user = await LCUser.getCurrent();
     if (user == null) {
       throw ArgumentError.notNull('current user');
     }
 
-    status.data[SourceKey] = user;
+    status.data![SourceKey] = user;
 
     LCQuery<LCObject> query = new LCQuery('_Follower');
     query.whereEqualTo('user', user);
@@ -75,12 +75,12 @@ class LCStatus extends LCObject {
     if (isNullOrEmpty(targetId)) {
       throw new ArgumentError.notNull('targetId');
     }
-    LCUser user = await LCUser.getCurrent();
+    LCUser? user = await LCUser.getCurrent();
     if (user == null) {
       throw ArgumentError.notNull('current user');
     }
 
-    status.data[SourceKey] = user;
+    status.data![SourceKey] = user;
 
     LCQuery<LCObject> query = new LCQuery('_User');
     query.whereEqualTo('objectId', targetId);
@@ -93,7 +93,7 @@ class LCStatus extends LCObject {
 
   /// Send a status to users matching a [LCQuery].
   Future<LCStatus> send() async {
-    LCUser user = await LCUser.getCurrent();
+    LCUser? user = await LCUser.getCurrent();
     if (user == null) {
       throw ArgumentError.notNull('current user');
     }
@@ -105,8 +105,8 @@ class LCStatus extends LCObject {
       formData['data'] = _LCEncoder.encode(data);
     }
     if (query != null) {
-      Map queryData = {'className': query.className};
-      Map<String, dynamic> params = query._buildParams();
+      Map queryData = {'className': query!.className};
+      Map<String, dynamic> params = query!._buildParams();
       if (params.containsKey('where')) {
         queryData['where'] = jsonDecode(params['where']);
       }
@@ -115,8 +115,8 @@ class LCStatus extends LCObject {
       }
       formData['query'] = queryData;
     }
-    Map response = await LeanCloud._httpClient.post('statuses', data: formData);
-    _LCObjectData objectData = _LCObjectData.decode(response);
+    Map response = await (LeanCloud._httpClient.post('statuses', data: formData) as FutureOr<Map<dynamic, dynamic>>);
+    _LCObjectData objectData = _LCObjectData.decode(response as Map<String, dynamic>);
     _merge(objectData);
     return this;
   }
@@ -127,12 +127,12 @@ class LCStatus extends LCObject {
   /// this will delete this status and it will not be avaiable in other [LCUser]'s inboxes.
   /// If not, this will just delete this status from the current [LCUser]'s timeline.
   Future delete() async {
-    LCUser user = await LCUser.getCurrent();
+    LCUser? user = await LCUser.getCurrent();
     if (user == null) {
       throw ArgumentError.notNull('current user');
     }
 
-    LCUser source = data[SourceKey] ?? this[SourceKey];
+    LCUser? source = data![SourceKey] ?? this[SourceKey];
     if (source != null && source.objectId == user.objectId) {
       // 如果当前用户是 Status 的发布者，则直接删掉源 Status
       await LeanCloud._httpClient.delete('statuses/${super.objectId}');
@@ -149,8 +149,8 @@ class LCStatus extends LCObject {
   }
 
   /// Counts the statuses of [inboxType].
-  static Future<LCStatusCount> getCount({String inboxType}) async {
-    LCUser user = await LCUser.getCurrent();
+  static Future<LCStatusCount> getCount({String? inboxType}) async {
+    LCUser? user = await LCUser.getCurrent();
     if (user == null) {
       throw ArgumentError.notNull('current user');
     }
@@ -161,8 +161,8 @@ class LCStatus extends LCObject {
     if (!isNullOrEmpty(inboxType)) {
       params[InboxTypeKey] = inboxType;
     }
-    Map response = await LeanCloud._httpClient
-        .get('subscribe/statuses/count', queryParams: params);
+    Map response = await (LeanCloud._httpClient
+        .get('subscribe/statuses/count', queryParams: params) as FutureOr<Map<dynamic, dynamic>>);
     LCStatusCount statusCount = new LCStatusCount();
     statusCount.total = response['total'];
     statusCount.unread = response['unread'];
@@ -170,8 +170,8 @@ class LCStatus extends LCObject {
   }
 
   /// Resets unread count of [inboxType].
-  static Future resetUnreadCount({String inboxType}) async {
-    LCUser user = await LCUser.getCurrent();
+  static Future resetUnreadCount({String? inboxType}) async {
+    LCUser? user = await LCUser.getCurrent();
     if (user == null) {
       throw ArgumentError.notNull('current user');
     }

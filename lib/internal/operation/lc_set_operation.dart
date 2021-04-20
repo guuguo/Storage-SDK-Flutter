@@ -7,7 +7,7 @@ class _LCSetOperation extends _LCOperation {
   _LCSetOperation(this.value);
 
   @override
-  _LCOperation mergeWithPrevious(_LCOperation previousOp) {
+  _LCOperation mergeWithPrevious(_LCOperation? previousOp) {
     return this;
   }
 
